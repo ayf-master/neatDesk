@@ -1,0 +1,29 @@
+{
+  "name": "neatdesk",
+  "private": true,
+  "version": "0.1.0",
+  "description": "NeatDesk - 让桌面回归清爽",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.7",
+    "esbuild": "^0.28.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16",
+    "vue-tsc": "^3.3.5"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.11.0",
+    "@tauri-apps/cli": "^2.11.2",
+    "@tauri-apps/plugin-global-shortcut": "^2.3.2",
+    "lucide-vue-next": "^0.577.0",
+    "vue": "^3.5.38",
+    "vue-i18n": "^10.0.7",
+    "vue-router": "^4.6.4"
+  }
+}

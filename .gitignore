@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+src-tauri/target/
+
+# Cargo cache (project-local)
+.cargo/
+
+# Portable debug artifacts (built exe + screenshots)
+portable/
+
+# Logs
+*.log
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*
+
+# Rust debug symbols
+*.pdb
