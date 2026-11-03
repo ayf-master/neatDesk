@@ -24,3 +24,11 @@ Thumbs.db
 
 # Rust debug symbols
 *.pdb
+
+# Agent / editor tooling config (not part of the app)
+.workbuddy/
+.claude/
+
+# Dev-only debug scripts (CDP probes, window capture) — keep gen-*.py
+scripts/_*.py
+

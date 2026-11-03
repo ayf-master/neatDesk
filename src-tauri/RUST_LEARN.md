@@ -77,7 +77,7 @@ cargo --version   # 包管理器（类似 npm）
 
 **在 cleanApp 项目里编译运行：**
 ```bash
-cd D:\vibeCoding\cleanApp
+cd D:\path\to\neatDesk
 
 # 安装前端依赖
 npm install
