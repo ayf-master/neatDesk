@@ -1,0 +1,64 @@
+name: Release Windows 安装包
+
+# 触发条件：
+#   1) 推送形如 v0.1.0 的 tag 时自动发版
+#   2) 也可在 GitHub 仓库 Actions 页面手动触发 (workflow_dispatch)
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+# 创建 Release 并上传产物需要写权限
+permissions:
+  contents: write
+
+jobs:
+  build-windows-msi:
+    name: 构建并发布 Windows .msi
+    runs-on: windows-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: 安装 Rust 稳定工具链
+        uses: dtolnay/rust-toolchain@stable
+
+      # 缓存 Cargo 编译产物，二次构建大幅提速
+      - name: 缓存 Rust 构建
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: 安装前端依赖
+        run: npm ci
+
+      # tauri-action 会自动执行 tauri.conf.json 里的 beforeBuildCommand（npm run build），
+      # 再编译 Rust 并打 msi 包（targets 已在配置里设为 msi）。
+      # tauri build 会以生产模式嵌入前端资源，无需手动开 custom-protocol。
+      - name: 构建前端并打包 Windows 安装包
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: src-tauri
+          tagName: ${{ github.ref_name }}
+          releaseName: "NeatDesk ${{ github.ref_name }}"
+          releaseBody: |
+            NeatDesk ${{ github.ref_name }} 已发布。
+
+            ### 下载与安装
+            - 在下方 **Assets** 中下载 `.msi` 安装包，双击即可安装（安装包内置 WebView2 引导，无需额外运行环境）。
+            - 当前安装包**未做代码签名**，Windows SmartScreen 可能拦截，点击“仍要运行”即可继续。
+
+            ### 更新内容
+            见提交记录与本版本改动。
+          releaseDraft: false
+          prerelease: false

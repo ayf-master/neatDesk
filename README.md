@@ -39,7 +39,7 @@ NeatDesk 是一个轻量的 Windows 桌面整理工具。它会扫描你的桌�
 
 前往 [Releases](https://github.com/ayf-master/neatDesk/releases) 页面下载最新的 `.msi` 安装包，双击安装即可。
 
-> 说明：仓库发布安装包前，需要先构建（见下方"从源码构建"）。你也可以直接克隆源码自行构建。
+> 安装包由 GitHub Actions 在每次打 tag 时**自动构建并发布**（见 [.github/workflows/release.yml](./.github/workflows/release.yml)）。当前未做代码签名，首次运行若被 SmartScreen 拦截，点击"仍要运行"即可继续。
 
 ### 方式二：从源码构建
 
@@ -117,6 +117,25 @@ NeatDesk 的所有用户数据保存在：
 ```
 
 你可以直接备份这两个文件来迁移或恢复配置。
+
+## 发布新版本（自动构建）
+
+本项目通过 GitHub Actions 自动构建 Windows 安装包，维护者只需打一个 tag 即可触发发布：
+
+```bash
+# 在 main 分支上，让版本号与 tag 保持一致（示例为 0.1.0）
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+推送 `v*` 开头的 tag 后，CI 会自动：
+
+1. 检出代码、安装 Node 22 与 Rust 稳定版；
+2. 执行 `npm run build` 构建前端；
+3. 用 Tauri 打包 Windows `.msi`；
+4. 在 [Releases](https://github.com/ayf-master/neatDesk/releases) 创建以 tag 命名的 Release 并上传安装包。
+
+> 如需去除 SmartScreen 拦截，可在工作流中接入 Windows 代码签名证书，并在 `tauri.conf.json` 的 `bundle.windows.certificateThumbprint` 中配置。
 
 ## 贡献
 
