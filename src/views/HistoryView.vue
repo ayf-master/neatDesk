@@ -1,18 +1,18 @@
 <template>
   <div class="history">
     <div class="page-header">
-      <h2 class="page-title">整理历史</h2>
+      <h2 class="page-title">{{ $t("history.title") }}</h2>
       <div class="header-actions" v-if="records.length > 0">
         <button class="btn btn-secondary btn-sm" @click="confirmClearAll">
           <Trash2Icon :size="14" />
-          清空全部
+          {{ $t("history.clearAll") }}
         </button>
       </div>
     </div>
 
     <div v-if="loading" class="empty-state">
       <div class="spinner"></div>
-      <p>加载中...</p>
+      <p>{{ $t("common.loading") }}</p>
     </div>
 
     <div v-else-if="records.length > 0" class="history-list">
@@ -24,23 +24,23 @@
           <div class="history-content">
             <div class="history-header">
               <span class="history-time">{{ record.organized_at }}</span>
-              <span class="history-count">{{ record.total_files }} 个文件</span>
+              <span class="history-count">{{ $t("history.files", { count: record.total_files }) }}</span>
             </div>
             <div v-if="record.categories && record.categories.length > 0" class="history-categories">
               <span v-for="cat in record.categories" :key="cat.name" class="cat-tag">
                 {{ cat.name }}: {{ cat.count }}
               </span>
             </div>
-            <span v-if="record.undone" class="undone-badge">已撤销</span>
+            <span v-if="record.undone" class="undone-badge">{{ $t("history.undone") }}</span>
           </div>
         </div>
         <div class="history-actions">
           <button v-if="!record.undone" class="btn btn-danger btn-sm" @click="confirmUndo(record)">
-            撤销本次整理
+            {{ $t("history.undo") }}
           </button>
           <button class="btn btn-secondary btn-sm" @click="confirmDelete(record)">
             <Trash2Icon :size="13" />
-            删除记录
+            {{ $t("history.delete") }}
           </button>
         </div>
       </div>
@@ -48,20 +48,20 @@
 
     <div v-else class="empty-state">
       <ClockIcon :size="40" />
-      <p>暂无整理记录</p>
-      <p class="empty-hint">点击首页的「立即整理」开始</p>
+      <p>{{ $t("history.empty") }}</p>
+      <p class="empty-hint">{{ $t("history.emptyHint") }}</p>
     </div>
 
     <!-- 撤销确认 -->
     <ConfirmDialog
       :show="showUndoConfirm"
-      title="撤销整理"
-      :message="`确定要撤销 ${undoTarget?.organized_at} 的整理操作吗？`"
-      :details="undoTarget ? [`该次整理了 ${undoTarget.total_files} 个文件`] : undefined"
-      confirm-text="确认撤销"
+      :title="$t('history.undoConfirm.title')"
+      :message="$t('history.undoConfirm.message', { time: undoTarget?.organized_at })"
+      :details="undoTarget ? [$t('history.undoConfirm.details', { count: undoTarget.total_files })] : undefined"
+      :confirm-text="$t('history.undoConfirm.confirm')"
       variant="danger"
       :loading="undoLoading"
-      loading-text="撤销中..."
+      :loading-text="$t('history.undoing')"
       @confirm="handleUndo"
       @cancel="showUndoConfirm = false"
     />
@@ -69,9 +69,9 @@
     <!-- 删除确认 -->
     <ConfirmDialog
       :show="showDeleteConfirm"
-      title="删除记录"
-      message="确定要删除这条整理记录吗？这不会影响已整理的文件，仅删除历史记录。"
-      confirm-text="删除"
+      :title="$t('history.deleteConfirm.title')"
+      :message="$t('history.deleteConfirm.message')"
+      :confirm-text="$t('history.deleteConfirm.confirm')"
       variant="danger"
       :loading="deleteLoading"
       @confirm="handleDelete"
@@ -81,9 +81,9 @@
     <!-- 清空确认 -->
     <ConfirmDialog
       :show="showClearConfirm"
-      title="清空全部历史"
-      message="确定要清空所有整理历史记录吗？此操作不可恢复。"
-      confirm-text="清空全部"
+      :title="$t('history.clearConfirm.title')"
+      :message="$t('history.clearConfirm.message')"
+      :confirm-text="$t('history.clearConfirm.confirm')"
       variant="danger"
       :loading="clearLoading"
       @confirm="handleClearAll"
@@ -94,12 +94,14 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 import { CheckCircleIcon, ClockIcon, Trash2Icon } from "lucide-vue-next";
 import { api } from "../lib/api";
 import type { HistoryRecord } from "../lib/types";
 import ConfirmDialog from "../components/ConfirmDialog.vue";
 import { useToast } from "../composables/useToast";
 
+const { t } = useI18n();
 const { success, error } = useToast();
 
 const records = ref<HistoryRecord[]>([]);
@@ -124,7 +126,7 @@ async function loadHistory() {
   try {
     records.value = (await api.getHistory()) as HistoryRecord[];
   } catch (e) {
-    error("加载历史记录失败");
+    error(t("history.loadFail"));
     console.error(e);
   } finally {
     loading.value = false;
@@ -147,7 +149,7 @@ async function handleUndo() {
     success(msg);
     showUndoConfirm.value = false;
   } catch (e: any) {
-    error(typeof e === "string" ? e : "撤销失败");
+    error(typeof e === "string" ? e : t("history.undoFail"));
   } finally {
     undoLoading.value = false;
   }
@@ -165,10 +167,10 @@ async function handleDelete() {
   try {
     await api.deleteHistoryRecord(deleteTarget.value.id);
     records.value = records.value.filter((r) => r.id !== deleteTarget.value!.id);
-    success("记录已删除");
+    success(t("history.recordDeleted"));
     showDeleteConfirm.value = false;
   } catch (e: any) {
-    error(typeof e === "string" ? e : "删除失败");
+    error(typeof e === "string" ? e : t("history.deleteFail"));
   } finally {
     deleteLoading.value = false;
   }
@@ -184,10 +186,10 @@ async function handleClearAll() {
   try {
     await api.clearHistory();
     records.value = [];
-    success("已清空全部历史记录");
+    success(t("history.allCleared"));
     showClearConfirm.value = false;
   } catch (e: any) {
-    error(typeof e === "string" ? e : "清空失败");
+    error(typeof e === "string" ? e : t("history.clearFail"));
   } finally {
     clearLoading.value = false;
   }

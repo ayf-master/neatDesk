@@ -183,6 +183,7 @@ pub fn run() {
             commands::uninstall_context_menu,
             commands::compact_icons,
             commands::exit_app,
+            tray::set_tray_language,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

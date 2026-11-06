@@ -1,12 +1,12 @@
 <template>
   <div class="schedule">
-    <h2 class="page-title">定时整理</h2>
+    <h2 class="page-title">{{ $t("schedule.title") }}</h2>
 
     <div class="card">
       <div class="setting-row">
         <div class="setting-info">
-          <span class="setting-label">启用定时整理</span>
-          <span class="setting-desc">开启后，桌面将按照设定时间自动整理</span>
+          <span class="setting-label">{{ $t("schedule.enable") }}</span>
+          <span class="setting-desc">{{ $t("schedule.enableDesc") }}</span>
         </div>
         <label class="toggle">
           <input type="checkbox" v-model="enabled" />
@@ -18,48 +18,48 @@
         <div class="radio-group">
           <label class="radio-item">
             <input type="radio" v-model="scheduleType" value="interval" />
-            <span>间隔</span>
+            <span>{{ $t("schedule.interval") }}</span>
           </label>
           <label class="radio-item">
             <input type="radio" v-model="scheduleType" value="daily" />
-            <span>每天</span>
+            <span>{{ $t("schedule.daily") }}</span>
           </label>
           <label class="radio-item">
             <input type="radio" v-model="scheduleType" value="weekly" />
-            <span>每周</span>
+            <span>{{ $t("schedule.weekly") }}</span>
           </label>
         </div>
 
         <div v-if="scheduleType === 'interval'" class="schedule-detail">
-          <label>每</label>
+          <label>{{ $t("schedule.everyPrefix") }}</label>
           <input type="number" v-model.number="intervalHours" min="1" class="input-number" />
-          <label>小时整理一次</label>
+          <label>{{ $t("schedule.hoursSuffix") }}</label>
         </div>
 
         <div v-if="scheduleType === 'daily'" class="schedule-detail">
-          <label>每天</label>
+          <label>{{ $t("schedule.dailyPrefix") }}</label>
           <input type="time" v-model="dailyTime" class="input-time" />
-          <label>整理</label>
+          <label>{{ $t("schedule.timeSuffix") }}</label>
         </div>
 
         <div v-if="scheduleType === 'weekly'" class="schedule-detail">
-          <label>每周</label>
+          <label>{{ $t("schedule.weeklyPrefix") }}</label>
           <select v-model="weeklyDay" class="input-select">
-            <option value="Monday">周一</option>
-            <option value="Tuesday">周二</option>
-            <option value="Wednesday">周三</option>
-            <option value="Thursday">周四</option>
-            <option value="Friday">周五</option>
-            <option value="Saturday">周六</option>
-            <option value="Sunday">周日</option>
+            <option value="Monday">{{ $t("schedule.weekdays.Monday") }}</option>
+            <option value="Tuesday">{{ $t("schedule.weekdays.Tuesday") }}</option>
+            <option value="Wednesday">{{ $t("schedule.weekdays.Wednesday") }}</option>
+            <option value="Thursday">{{ $t("schedule.weekdays.Thursday") }}</option>
+            <option value="Friday">{{ $t("schedule.weekdays.Friday") }}</option>
+            <option value="Saturday">{{ $t("schedule.weekdays.Saturday") }}</option>
+            <option value="Sunday">{{ $t("schedule.weekdays.Sunday") }}</option>
           </select>
           <input type="time" v-model="weeklyTime" class="input-time" />
-          <label>整理</label>
+          <label>{{ $t("schedule.timeSuffix") }}</label>
         </div>
       </div>
 
       <div class="save-area">
-        <button class="btn btn-primary" @click="saveSchedule">保存设置</button>
+        <button class="btn btn-primary" @click="saveSchedule">{{ $t("schedule.save") }}</button>
       </div>
     </div>
   </div>
@@ -67,10 +67,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 import { api } from "../lib/api";
 import type { AppConfig } from "../lib/types";
 import { useToast } from "../composables/useToast";
 
+const { t } = useI18n();
 const { success, error } = useToast();
 
 const enabled = ref(false);
@@ -104,9 +106,9 @@ async function saveSchedule() {
     config.schedule.weekly_day = weeklyDay.value;
     config.schedule.weekly_time = weeklyTime.value;
     await api.updateConfig(config);
-    success("定时设置已保存");
+    success(t("schedule.saved"));
   } catch (e) {
-    error("保存定时配置失败");
+    error(t("schedule.saveFail"));
     console.error(e);
   }
 }

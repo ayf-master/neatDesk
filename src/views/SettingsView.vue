@@ -1,40 +1,40 @@
 <template>
   <div class="settings">
-    <h2 class="page-title">设置</h2>
+    <h2 class="page-title">{{ $t('settings.title') }}</h2>
 
     <div class="card settings-section">
-      <h3 class="section-title">排除列表</h3>
-      <p class="section-desc">这些文件/文件夹不会被整理</p>
+      <h3 class="section-title">{{ $t('settings.exclusions') }}</h3>
+      <p class="section-desc">{{ $t('settings.exclusionsDesc') }}</p>
 
       <div class="input-row">
         <input
           v-model="newExclude"
           type="text"
-          placeholder="输入文件名或文件夹名，按回车添加"
+          :placeholder="$t('settings.exclusionPlaceholder')"
           class="input-text"
           @keyup.enter="addExclusion"
         />
-        <button class="btn btn-primary btn-sm" @click="addExclusion">添加</button>
+        <button class="btn btn-primary btn-sm" @click="addExclusion">{{ $t('settings.add') }}</button>
       </div>
 
       <div class="exclusion-list">
         <div v-for="(item, index) in fileExclusions" :key="index" class="exclusion-item">
           <span class="exclusion-name">{{ item }}</span>
-          <button class="btn-icon" @click="removeExclusion(index)" title="移除">
+          <button class="btn-icon" @click="removeExclusion(index)" :title="$t('settings.remove')">
             <XIcon :size="14" />
           </button>
         </div>
-        <p v-if="fileExclusions.length === 0" class="empty-hint">暂无排除项</p>
+        <p v-if="fileExclusions.length === 0" class="empty-hint">{{ $t('settings.noExclusions') }}</p>
       </div>
     </div>
 
     <div class="card settings-section">
-      <h3 class="section-title">其他设置</h3>
+      <h3 class="section-title">{{ $t('settings.other') }}</h3>
 
       <div class="setting-row">
         <div class="setting-info">
-          <span class="setting-label">整理后自动补齐</span>
-          <span class="setting-desc">移动文件后，剩余文件按顺序向前补齐空位，让桌面更紧凑</span>
+          <span class="setting-label">{{ $t('settings.compactAuto') }}</span>
+          <span class="setting-desc">{{ $t('settings.compactAutoDesc') }}</span>
         </div>
         <label class="toggle">
           <input type="checkbox" v-model="compactAfterOrganize" @change="saveConfig" />
@@ -44,11 +44,11 @@
 
       <div class="setting-row">
         <div class="setting-info">
-          <span class="setting-label">立即补齐</span>
-          <span class="setting-desc">手动将桌面图标向前紧凑排列，消除空位</span>
+          <span class="setting-label">{{ $t('settings.compactNow') }}</span>
+          <span class="setting-desc">{{ $t('settings.compactNowDesc') }}</span>
         </div>
         <button class="btn btn-primary btn-sm" :disabled="compacting" @click="doCompact">
-          {{ compacting ? '补齐中...' : '执行补齐' }}
+          {{ compacting ? $t('settings.compacting') : $t('settings.compactRun') }}
         </button>
       </div>
 
@@ -88,28 +88,28 @@
     </div>
 
     <div class="card shortcuts-section">
-      <h3 class="section-title">快捷键</h3>
+      <h3 class="section-title">{{ $t('settings.shortcut') }}</h3>
       <div class="shortcut-row">
         <div class="setting-info">
-          <span class="setting-label">一键整理</span>
-          <span class="setting-desc">按下快捷键立即整理桌面文件</span>
+          <span class="setting-label">{{ $t('settings.oneClickOrganize') }}</span>
+          <span class="setting-desc">{{ $t('settings.shortcutDesc') }}</span>
         </div>
         <button v-if="!isRecording" class="shortcut-btn" @click="startRecording">
           <kbd class="shortcut-keys">{{ currentShortcut || 'Ctrl + Shift + C' }}</kbd>
-          <span class="shortcut-edit">修改</span>
+          <span class="shortcut-edit">{{ $t('settings.shortcutModify') }}</span>
         </button>
         <div v-else class="shortcut-recording" @keydown="onKeyDown" tabindex="0" ref="recordingRef">
-          <span class="recording-text">按下新快捷键...</span>
+          <span class="recording-text">{{ $t('settings.shortcutRecording') }}</span>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <h3 class="section-title">桌面右键菜单</h3>
+      <h3 class="section-title">{{ $t('settings.contextMenu') }}</h3>
       <div class="setting-row">
         <div class="setting-info">
-          <span class="setting-label">桌面右键「一键整理」</span>
-          <span class="setting-desc">在桌面空白处右键可直接整理</span>
+          <span class="setting-label">{{ $t('settings.contextMenuItem') }}</span>
+          <span class="setting-desc">{{ $t('settings.contextMenuDesc') }}</span>
         </div>
         <label class="toggle">
           <input type="checkbox" v-model="contextMenuEnabled" @change="toggleContextMenu" />
@@ -119,20 +119,20 @@
     </div>
 
     <div class="card about-section">
-      <h3 class="section-title">关于</h3>
+      <h3 class="section-title">{{ $t('settings.about') }}</h3>
       <div class="about-logo">
         <span class="about-icon">ND</span>
       </div>
       <p class="about-name">NeatDesk</p>
       <p class="about-version">v0.1.0</p>
-      <p class="about-desc">让桌面回归清爽</p>
+      <p class="about-desc">{{ $t('settings.slogan') }}</p>
       <div class="about-divider"></div>
-      <p class="about-copyright">© 2026 ayf-master</p>
+      <p class="about-copyright">{{ $t('settings.copyright') }}</p>
       <button class="btn btn-secondary btn-sm onboarding-btn" @click="reopenOnboarding">
-        重新查看新手引导
+        {{ $t('settings.replayOnboarding') }}
       </button>
       <button class="btn btn-danger btn-sm onboarding-btn" @click="exitApp">
-        退出应用
+        {{ $t('settings.exitApp') }}
       </button>
     </div>
 
@@ -148,6 +148,7 @@ import type { AppConfig } from "../lib/types";
 import { useToast } from "../composables/useToast";
 
 const { success, error } = useToast();
+const { t, locale } = useI18n();
 
 const fileExclusions = ref<string[]>([]);
 const newExclude = ref("");
@@ -160,10 +161,10 @@ const compacting = ref(false);
 async function doCompact() {
   compacting.value = true;
   try {
-    const msg = await api.compactIcons();
-    success(msg);
+    await api.compactIcons();
+    success(t("settings.compactDone"));
   } catch (e: any) {
-    error(typeof e === "string" ? e : "补齐失败");
+    error(typeof e === "string" ? e : t("settings.compactFail"));
   } finally {
     compacting.value = false;
   }
@@ -198,9 +199,9 @@ async function saveConfig() {
     config.settings.theme = theme.value;
     config.settings.language = currentLocale.value;
     await api.updateConfig(config);
-    success("设置已保存");
+    success(t("common.saved"));
   } catch (e) {
-    error("保存设置失败");
+    error(t("settings.saveFail"));
     console.error(e);
   }
 }
@@ -250,32 +251,32 @@ async function saveShortcut(shortcut: string) {
     await api.updateConfig(config);
     // 再通知后端注册
     await api.updateShortcut(shortcut);
-    success(`快捷键已设置为 ${shortcut}`);
+    success(t("settings.shortcutSet", { shortcut }));
   } catch (e: any) {
-    error(typeof e === "string" ? e : "设置快捷键失败");
+    error(typeof e === "string" ? e : t("settings.shortcutFail"));
   }
 }
 
 const reopenOnboarding = inject("showOnboarding") as (() => void) | undefined;
 
 function switchLanguage() {
-  // @ts-ignore - vue-i18n composable
-  const i18n = useI18n();
-  i18n.locale.value = currentLocale.value;
+  locale.value = currentLocale.value;
   saveGeneralSettings();
+  // 同步更新系统托盘菜单语言
+  api.setTrayLanguage(currentLocale.value).catch(() => {});
 }
 
 async function toggleContextMenu() {
   try {
     if (contextMenuEnabled.value) {
       await api.installContextMenu();
-      success("右键菜单已安装，刷新桌面后生效");
+      success(t("settings.contextMenuInstalled"));
     } else {
       await api.uninstallContextMenu();
-      success("右键菜单已卸载");
+      success(t("settings.contextMenuUninstalled"));
     }
   } catch (e: any) {
-    error(typeof e === "string" ? e : "操作失败");
+    error(typeof e === "string" ? e : t("settings.opFailed"));
     contextMenuEnabled.value = !contextMenuEnabled.value;
   }
 }
@@ -315,7 +316,7 @@ async function saveGeneralSettings() {
   try {
     await api.setAutoStart(autoStart.value);
   } catch (e) {
-    error("设置开机自启失败");
+    error(t("settings.autoStartFail"));
     console.error(e);
   }
 }

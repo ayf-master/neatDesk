@@ -33,4 +33,7 @@ export const api = {
   compactIcons: () => invoke<string>("compact_icons"),
   setAutoStart: (enabled: boolean) => invoke("set_auto_start", { enabled }),
   exitApp: () => invoke("exit_app"),
+
+  // 托盘语言同步
+  setTrayLanguage: (language: string) => invoke("set_tray_language", { language }),
 };

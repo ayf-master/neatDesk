@@ -1,19 +1,19 @@
 <template>
   <div class="categories">
     <div class="page-header">
-      <h2 class="page-title">分类管理</h2>
+      <h2 class="page-title">{{ $t("categories.title") }}</h2>
       <button class="btn btn-primary" @click="openAddDialog">
         <PlusIcon :size="16" />
-        新增分类
+        {{ $t("categories.add") }}
       </button>
     </div>
 
-    <p class="page-desc">设置文件扩展名对应的分类。整理时文件将按规则移入对应名称的文件夹。启用的分类才会参与整理。</p>
+    <p class="page-desc">{{ $t("categories.desc") }}</p>
 
     <!-- 加载状态 -->
     <div v-if="loading" class="empty-state">
       <div class="spinner"></div>
-      <p>加载中...</p>
+      <p>{{ $t("common.loading") }}</p>
     </div>
 
     <!-- 分类列表 -->
@@ -26,42 +26,42 @@
           <div class="category-content">
             <div class="category-header">
               <span class="category-name">{{ cat.name }}</span>
-              <span v-if="!cat.enabled" class="disabled-badge">已禁用</span>
-              <span v-if="cat.id === 'others'" class="builtin-badge">内置</span>
+              <span v-if="!cat.enabled" class="disabled-badge">{{ $t("categories.disabled") }}</span>
+              <span v-if="cat.id === 'others'" class="builtin-badge">{{ $t("categories.builtin") }}</span>
             </div>
             <div class="category-extensions">
-              <span v-if="cat.extensions.length === 0" class="ext-empty">匹配所有未分类文件</span>
+              <span v-if="cat.extensions.length === 0" class="ext-empty">{{ $t("categories.matchAll") }}</span>
               <span v-for="ext in cat.extensions" :key="ext" class="ext-tag">{{ ext }}</span>
             </div>
             <div v-if="cat.name_patterns && cat.name_patterns.length > 0" class="category-patterns">
-              <span class="pattern-label">文件名含：</span>
+              <span class="pattern-label">{{ $t("categories.nameContains") }}</span>
               <span v-for="p in cat.name_patterns" :key="p" class="pattern-tag">{{ p }}</span>
             </div>
             <div class="category-target">
               <span>→</span>
               <span v-if="cat.target_path" class="target-path">{{ cat.target_path }}</span>
-              <span v-else class="target-path target-default">桌面</span>
+              <span v-else class="target-path target-default">{{ $t("categories.desktop") }}</span>
             </div>
           </div>
         </div>
         <div class="category-actions">
           <button class="btn btn-secondary btn-sm" @click="toggleEnabled(cat.id)">
-            {{ cat.enabled ? "禁用" : "启用" }}
+            {{ cat.enabled ? $t("categories.disable") : $t("categories.enable") }}
           </button>
-          <button class="btn btn-secondary btn-sm" @click="openEditDialog(cat)">编辑</button>
+          <button class="btn btn-secondary btn-sm" @click="openEditDialog(cat)">{{ $t("categories.edit") }}</button>
           <button
             v-if="cat.id !== 'others'"
             class="btn btn-danger btn-sm"
             @click="confirmDelete(cat)"
           >
-            删除
+            {{ $t("categories.delete") }}
           </button>
         </div>
       </div>
     </div>
 
     <div v-else class="empty-state">
-      <p>暂无分类，点击"新增分类"创建</p>
+      <p>{{ $t("categories.empty") }}</p>
     </div>
 
     <!-- 编辑对话框 -->
@@ -75,9 +75,9 @@
     <!-- 确认删除对话框 -->
     <ConfirmDialog
       :show="showDeleteConfirm"
-      title="删除分类"
-      :message="`确定要删除「${deletingCategory?.name}」分类吗？`"
-      confirm-text="删除"
+      :title="$t('categories.deleteConfirm.title')"
+      :message="$t('categories.deleteConfirm.message', { name: deletingCategory?.name })"
+      :confirm-text="$t('categories.deleteConfirm.confirm')"
       variant="danger"
       @confirm="handleDelete"
       @cancel="showDeleteConfirm = false"
@@ -87,6 +87,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 import { PlusIcon } from "lucide-vue-next";
 import { api } from "../lib/api";
 import type { Category, AppConfig } from "../lib/types";
@@ -94,6 +95,7 @@ import CategoryDialog from "../components/CategoryDialog.vue";
 import ConfirmDialog from "../components/ConfirmDialog.vue";
 import { useToast } from "../composables/useToast";
 
+const { t } = useI18n();
 const { success, error } = useToast();
 
 const categories = ref<Category[]>([]);
@@ -118,7 +120,7 @@ async function loadConfig() {
     const config = (await api.getConfig()) as AppConfig;
     categories.value = config.categories;
   } catch (e) {
-    error("加载配置失败");
+    error(t("categories.loadFail"));
     console.error(e);
   } finally {
     loading.value = false;
@@ -131,7 +133,7 @@ async function saveConfig() {
     config.categories = categories.value;
     await api.updateConfig(config);
   } catch (e) {
-    error("保存失败");
+    error(t("categories.saveFail"));
     console.error(e);
     throw e;
   }
@@ -167,9 +169,9 @@ async function handleSave(catData: Omit<Category, "id"> & { id?: string }) {
       categories.value.push(cat);
     }
     await saveConfig();
-    success(editingCategory.value ? "分类已更新" : "分类已添加");
+    success(editingCategory.value ? t("categories.updated") : t("categories.added"));
   } catch {
-    error("操作失败");
+    error(t("categories.opFailed"));
   }
 }
 
@@ -179,7 +181,7 @@ async function toggleEnabled(catId: string) {
   cat.enabled = !cat.enabled;
   try {
     await saveConfig();
-    success(cat.enabled ? "已启用" : "已禁用");
+    success(cat.enabled ? t("categories.enabledToast") : t("categories.disabledToast"));
   } catch {
     cat.enabled = !cat.enabled;
   }
@@ -197,9 +199,9 @@ async function handleDelete() {
   categories.value = categories.value.filter((c) => c.id !== catId);
   try {
     await saveConfig();
-    success("分类已删除");
+    success(t("categories.deleted"));
   } catch {
-    error("删除失败");
+    error(t("categories.deleteFail"));
   }
 }
 

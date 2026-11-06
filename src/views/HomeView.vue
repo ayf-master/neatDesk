@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h2 class="page-title">首页</h2>
+    <h2 class="page-title">{{ $t("home.title") }}</h2>
 
     <div class="summary-cards">
       <div class="card summary-card">
@@ -8,8 +8,8 @@
           <MonitorIcon :size="24" />
         </div>
         <div class="summary-info">
-          <span class="summary-label">桌面文件</span>
-          <span class="summary-value">{{ desktopSummary.total_files }} 个</span>
+          <span class="summary-label">{{ $t("home.desktopFiles") }}</span>
+          <span class="summary-value">{{ $t("home.filesValue", { count: desktopSummary.total_files }) }}</span>
         </div>
       </div>
       <div class="card summary-card">
@@ -17,8 +17,8 @@
           <FolderTreeIcon :size="24" />
         </div>
         <div class="summary-info">
-          <span class="summary-label">分类数</span>
-          <span class="summary-value">{{ categoryCount }} 类</span>
+          <span class="summary-label">{{ $t("home.categories") }}</span>
+          <span class="summary-value">{{ $t("home.categoriesValue", { count: categoryCount }) }}</span>
         </div>
       </div>
       <div class="card summary-card">
@@ -26,15 +26,15 @@
           <CalendarIcon :size="24" />
         </div>
         <div class="summary-info">
-          <span class="summary-label">上次整理</span>
-          <span class="summary-value">{{ lastOrganized || "暂无" }}</span>
+          <span class="summary-label">{{ $t("home.lastOrganized") }}</span>
+          <span class="summary-value">{{ lastOrganized || $t("home.none") }}</span>
         </div>
       </div>
     </div>
 
     <!-- 桌面文件按分类分布 -->
     <div v-if="desktopSummary.categories && desktopSummary.categories.length > 0" class="card category-dist-card">
-      <h3 class="section-title">桌面文件分布</h3>
+      <h3 class="section-title">{{ $t("home.fileDistribution") }}</h3>
       <div class="category-bar-list">
         <div v-for="cat in desktopSummary.categories" :key="cat.id" class="category-bar-row">
           <span class="bar-label">{{ cat.name }}</span>
@@ -44,7 +44,7 @@
               :style="{ width: (cat.count / desktopSummary.total_files * 100) + '%' }"
             ></div>
           </div>
-          <span class="bar-count">{{ cat.count }} 个</span>
+          <span class="bar-count">{{ $t("home.filesValue", { count: cat.count }) }}</span>
         </div>
       </div>
     </div>
@@ -52,19 +52,19 @@
     <div class="action-area">
       <button class="btn btn-primary btn-large" @click="handleOrganize" :disabled="isOrganizing">
         <RefreshCwIcon :size="20" :class="{ spinning: isOrganizing }" />
-        {{ isOrganizing ? "整理中..." : "立即整理" }}
+        {{ isOrganizing ? $t("home.organizing") : $t("home.organizeNow") }}
       </button>
     </div>
 
     <div v-if="organizeResult" class="card result-card">
       <div class="result-header">
         <CheckCircleIcon :size="20" class="result-icon" />
-        <span>整理完成</span>
+        <span>{{ $t("home.organizeComplete") }}</span>
       </div>
       <div class="result-stats">
-        <span class="stat-success">成功 {{ organizeResult.success_count }} 个</span>
+        <span class="stat-success">{{ $t("home.successCount", { count: organizeResult.success_count }) }}</span>
         <span v-if="organizeResult.failed_count > 0" class="stat-failed">
-          失败 {{ organizeResult.failed_count }} 个
+          {{ $t("home.failedCount", { count: organizeResult.failed_count }) }}
         </span>
       </div>
       <div class="result-categories">
@@ -73,14 +73,14 @@
         </span>
       </div>
       <div v-if="organizeResult.errors && organizeResult.errors.length > 0" class="result-errors">
-        <p class="error-title">失败详情：</p>
+        <p class="error-title">{{ $t("home.errorsTitle") }}</p>
         <div v-for="err in organizeResult.errors" :key="err.file_name" class="error-item">
           <span class="error-file">{{ err.file_name }}</span>
           <span class="error-reason">{{ err.reason }}</span>
         </div>
       </div>
       <div v-if="organizeResult.compact_log" class="compact-log">
-        <p class="compact-log-title">桌面图标补齐日志：</p>
+        <p class="compact-log-title">{{ $t("home.compactLogTitle") }}</p>
         <pre class="compact-log-content">{{ organizeResult.compact_log }}</pre>
       </div>
     </div>
@@ -89,11 +89,13 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 import { MonitorIcon, FolderTreeIcon, CalendarIcon, RefreshCwIcon, CheckCircleIcon } from "lucide-vue-next";
 import { api } from "../lib/api";
 import type { AppConfig, HistoryRecord, OrganizeResult } from "../lib/types";
 import { useToast } from "../composables/useToast";
 
+const { t, locale } = useI18n();
 const { success, error } = useToast();
 
 interface CategorySummary {
@@ -154,12 +156,16 @@ async function handleOrganize() {
   try {
     const res = await api.organizeDesktop() as OrganizeResult;
     organizeResult.value = res;
-    lastOrganized.value = new Date().toLocaleString("zh-CN");
-    success(`整理完成：成功 ${res.success_count} 个${res.failed_count > 0 ? `，${res.failed_count} 个失败` : ""}`);
+    lastOrganized.value = new Date().toLocaleString(locale.value);
+    success(
+      res.failed_count > 0
+        ? t("home.toastDoneFailed", { success: res.success_count, failed: res.failed_count })
+        : t("home.toastDone", { success: res.success_count })
+    );
     // 整理后重新加载概况
     await loadData();
   } catch (e: any) {
-    error(typeof e === "string" ? e : "整理失败，请重试");
+    error(typeof e === "string" ? e : t("home.organizeFailed"));
   } finally {
     isOrganizing.value = false;
   }
@@ -259,7 +265,7 @@ onMounted(loadData);
 }
 
 .bar-count {
-  width: 48px;
+  min-width: 48px;
   font-size: 12px;
   color: var(--text-secondary);
   text-align: right;

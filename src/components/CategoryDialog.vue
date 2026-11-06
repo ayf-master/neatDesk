@@ -1,39 +1,35 @@
 <template>
   <div class="dialog-overlay" v-if="show" @click.self="$emit('close')">
     <div class="dialog-card card">
-      <h3 class="dialog-title">{{ isEditing ? "编辑分类" : "新增分类" }}</h3>
+      <h3 class="dialog-title">{{ isEditing ? $t("categories.dialog.edit") : $t("categories.dialog.add") }}</h3>
 
       <div class="form-group">
-        <label>分类名称</label>
-        <input v-model="form.name" type="text" class="input-text" placeholder="如：图片、文档" />
+        <label>{{ $t("categories.dialog.name") }}</label>
+        <input v-model="form.name" type="text" class="input-text" :placeholder="$t('categories.dialog.namePlaceholder')" />
       </div>
 
       <div class="form-group">
-        <label>文件扩展名</label>
-        <p class="form-hint">每行一个扩展名，如 .jpg .png</p>
-        <textarea v-model="extensionsText" class="input-textarea" rows="4" placeholder=".jpg
-.png
-.gif"></textarea>
+        <label>{{ $t("categories.dialog.extensions") }}</label>
+        <p class="form-hint">{{ $t("categories.dialog.extensionsHint") }}</p>
+        <textarea v-model="extensionsText" class="input-textarea" rows="4" :placeholder="$t('categories.dialog.extensionsPlaceholder')"></textarea>
       </div>
 
       <div class="form-group">
-        <label>文件名关键词</label>
-        <p class="form-hint">文件名包含这些字的文件归入此类，每行一个关键词</p>
-        <textarea v-model="namePatternsText" class="input-textarea" rows="3" placeholder="报告
-合同
-photo"></textarea>
+        <label>{{ $t("categories.dialog.namePatterns") }}</label>
+        <p class="form-hint">{{ $t("categories.dialog.namePatternsHint") }}</p>
+        <textarea v-model="namePatternsText" class="input-textarea" rows="3" :placeholder="$t('categories.dialog.namePatternsPlaceholder')"></textarea>
       </div>
 
       <div class="form-group">
-        <label>目标路径（可选）</label>
-        <p class="form-hint">留空则整理到桌面，可指定如 D:\图片</p>
-        <input v-model="targetPathText" type="text" class="input-text" placeholder="留空=桌面" />
+        <label>{{ $t("categories.dialog.targetPath") }}</label>
+        <p class="form-hint">{{ $t("categories.dialog.targetPathHint") }}</p>
+        <input v-model="targetPathText" type="text" class="input-text" :placeholder="$t('categories.dialog.targetPathPlaceholder')" />
       </div>
 
       <div class="dialog-actions">
-        <button class="btn btn-secondary" @click="$emit('close')">取消</button>
+        <button class="btn btn-secondary" @click="$emit('close')">{{ $t("categories.dialog.cancel") }}</button>
         <button class="btn btn-primary" @click="handleSave" :disabled="!form.name.trim()">
-          {{ isEditing ? "保存修改" : "添加分类" }}
+          {{ isEditing ? $t("categories.dialog.save") : $t("categories.dialog.addConfirm") }}
         </button>
       </div>
     </div>

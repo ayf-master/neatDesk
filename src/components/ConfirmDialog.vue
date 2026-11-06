@@ -9,14 +9,14 @@
       </div>
 
       <div class="dialog-actions">
-        <button class="btn btn-secondary" @click="handleCancel">{{ cancelText }}</button>
+        <button class="btn btn-secondary" @click="handleCancel">{{ cancelText ?? $t("common.cancel") }}</button>
         <button
           class="btn"
           :class="confirmClass"
           @click="handleConfirm"
           :disabled="loading"
         >
-          {{ loading ? loadingText : confirmText }}
+          {{ loading ? (loadingText ?? $t("common.processing")) : (confirmText ?? $t("common.confirm")) }}
         </button>
       </div>
     </div>
@@ -37,11 +37,8 @@ const props = withDefaults(defineProps<{
   loading?: boolean;
   loadingText?: string;
 }>(), {
-  confirmText: "确认",
-  cancelText: "取消",
   variant: "primary",
   loading: false,
-  loadingText: "处理中...",
 });
 
 const emit = defineEmits<{
