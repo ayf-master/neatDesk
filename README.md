@@ -125,9 +125,9 @@ NeatDesk 的所有用户数据保存在：
 本项目通过 GitHub Actions 自动构建 Windows 安装包，维护者只需打一个 tag 即可触发发布：
 
 ```bash
-# 在 main 分支上，让版本号与 tag 保持一致（示例为 0.1.0）
-git tag v0.1.0
-git push origin v0.1.0
+# 在 main 分支上，让版本号与 tag 保持一致（示例为 0.2.0）
+git tag v0.2.0
+git push origin v0.2.0
 ```
 
 推送 `v*` 开头的 tag 后，CI 会自动：

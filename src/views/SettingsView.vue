@@ -124,7 +124,7 @@
         <span class="about-icon">ND</span>
       </div>
       <p class="about-name">NeatDesk</p>
-      <p class="about-version">v0.1.0</p>
+      <p class="about-version">v0.2.0</p>
       <p class="about-desc">{{ $t('settings.slogan') }}</p>
       <div class="about-divider"></div>
       <p class="about-copyright">{{ $t('settings.copyright') }}</p>

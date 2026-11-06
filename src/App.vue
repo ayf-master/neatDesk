@@ -3,7 +3,7 @@
     <aside class="sidebar">
       <div class="sidebar-header">
         <h1 class="app-title">NeatDesk</h1>
-        <span class="app-version">v0.1.0</span>
+        <span class="app-version">v0.2.0</span>
       </div>
       <nav class="sidebar-nav">
         <router-link to="/" class="nav-item">

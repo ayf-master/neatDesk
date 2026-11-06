@@ -125,9 +125,9 @@ You can back up these two files to migrate or restore your configuration.
 This project builds the Windows installer via GitHub Actions automatically. Maintainers only need to push a tag to trigger a release:
 
 ```bash
-# On the main branch, keep the version in sync with the tag (0.1.0 shown as an example)
-git tag v0.1.0
-git push origin v0.1.0
+# On the main branch, keep the version in sync with the tag (0.2.0 shown as an example)
+git tag v0.2.0
+git push origin v0.2.0
 ```
 
 After pushing a `v*` tag, CI automatically:
